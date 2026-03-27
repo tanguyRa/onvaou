@@ -1,0 +1,70 @@
+# Dependencies
+node_modules
+.pnpm-store
+
+# Build outputs
+dist
+build
+.next
+.turbo
+.wrangler
+.svelte-kit
+
+# Environment
+.env
+.envrc
+.env*.local
+.dev.vars
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+.DS_Store
+
+# Testing
+coverage
+
+# Logs
+*.log
+logs
+
+# Database
+*.db
+*.db-shm
+*.db-wal
+
+# Cloudflare
+.mf
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.ruff_cache/
+venv/
+.venv/
+
+# Go
+api/tmp/
+api/*.exe
+api/*.exe~
+api/*.dll
+api/*.so
+api/*.dylib
+api/vendor/
+
+# Air (Go hot reload)
+tmp/
+
+# Archive (old project files)
+data/
+
+# Cursor
+.cursorignore
+.cursorindexingignore
+
+.env*
+!.env.example

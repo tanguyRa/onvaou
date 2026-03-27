@@ -1,0 +1,168 @@
+{
+  "landing": {
+    "nav": {
+      "features": "Funciones",
+      "pricing": "Precios",
+      "openApp": "Abrir app",
+      "signIn": "Iniciar sesion",
+      "getStarted": "Empezar"
+    },
+    "hero": {
+      "eyebrow": "Base SaaS generica",
+      "title": "Lanza tu proximo SaaS mas rapido.",
+      "subtitle": "Plantilla frontend neutra con auth, i18n y cobros ya conectados.",
+      "primaryCta": "Crear cuenta",
+      "secondaryCta": "Ver precios"
+    },
+    "features": {
+      "title": "Ejemplos incluidos",
+      "subtitle": "Bloques minimos para empezar rapido sin texto especifico de producto.",
+      "cards": {
+        "i18n": {
+          "title": "Localizacion",
+          "body": "Cambia el idioma desde el encabezado con i18next."
+        },
+        "auth": {
+          "title": "Autenticacion",
+          "body": "Flujos de email para login/registro con Better Auth."
+        },
+        "billing": {
+          "title": "Suscripciones",
+          "body": "La pagina de precios soporta productos y checkout de Polar."
+        }
+      }
+    },
+    "footer": {
+      "text": "Plantilla semilla para futuros proyectos SaaS.",
+      "pricing": "Precios",
+      "login": "Iniciar sesion",
+      "register": "Crear cuenta"
+    }
+  },
+  "pricing": {
+    "title": "Precios",
+    "subtitle": "Conecta productos de Polar para planes reales. Mientras tanto se muestran planes demo.",
+    "loading": "Cargando planes...",
+    "free": "Gratis",
+    "monthly": "/mes",
+    "yearly": "/ano",
+    "cta": "Continuar",
+    "processing": "Procesando..."
+  },
+  "common": {
+    "errors": {
+      "unexpected": "Ocurrio un error inesperado",
+      "network": "Error de red. Intentalo de nuevo.",
+      "apiUnavailable": "El servicio esta temporalmente no disponible. Intentalo de nuevo."
+    }
+  },
+  "auth": {
+    "fields": {
+      "name": "Nombre",
+      "namePlaceholder": "Juan Perez",
+      "email": "Email",
+      "emailPlaceholder": "tu@example.com",
+      "password": "Contrasena",
+      "passwordPlaceholder": "••••••••"
+    },
+    "login": {
+      "title": "Iniciar sesion",
+      "subtitle": "Accede a tu espacio de trabajo",
+      "actions": {
+        "signIn": "Entrar",
+        "signingIn": "Entrando..."
+      },
+      "errors": {
+        "failed": "Fallo de inicio de sesion"
+      },
+      "footer": {
+        "noAccount": "No tienes cuenta?",
+        "signUp": "Registrate"
+      }
+    },
+    "register": {
+      "title": "Crear cuenta",
+      "subtitle": "Configura tu espacio de trabajo",
+      "actions": {
+        "createAccount": "Crear cuenta",
+        "creatingAccount": "Creando cuenta..."
+      },
+      "errors": {
+        "failed": "Fallo de registro"
+      },
+      "footer": {
+        "hasAccount": "Ya tienes cuenta?",
+        "signIn": "Iniciar sesion"
+      }
+    }
+  },
+  "protected": {
+    "sidebar": {
+      "toggle": "Alternar barra lateral",
+      "settings": "Configuracion",
+      "profile": "Perfil",
+      "billing": "Facturacion",
+      "apiKeys": "Claves API",
+      "logout": "Cerrar sesion"
+    }
+  },
+  "dashboard": {
+    "header": {
+      "welcome": "Bienvenido",
+      "userFallback": "Usuario",
+      "freePlan": "Plan gratis",
+      "premiumPlan": "Premium",
+      "syncing": "Sincronizando",
+      "live": "Activo"
+    },
+    "links": {
+      "title": "Agregar enlaces",
+      "subtitle": "Agrega enlaces y crearemos un resumen de 10 min.",
+      "placeholder": "https://example.com/article\nhttps://another.com/post",
+      "save": "Guardar enlaces",
+      "saving": "Guardando..."
+    },
+    "inbox": {
+      "title": "Bandeja de newsletters",
+      "subtitle": "Reenvia newsletters para generar historias.",
+      "loading": "Cargando direccion...",
+      "copy": "Copiar",
+      "copied": "Copiado",
+      "unavailable": "Bandeja no disponible"
+    },
+    "activity": {
+      "title": "Flujo de actividad",
+      "subtitle": "Enlaces y newsletters en proceso.",
+      "loading": "Cargando actividad...",
+      "empty": "Aun no hay actividad. Agrega un enlace para empezar."
+    },
+    "stories": {
+      "title": "Tus historias",
+      "subtitle": "Actualizaciones extensas y curadas para ti.",
+      "emptyTitle": "No hay historias aun",
+      "emptyBody": "Agrega un enlace o reenvia un newsletter para crear tu primera historia.",
+      "minRead": "min de lectura",
+      "read": "Leer"
+    },
+    "labels": {
+      "link": "Enlace",
+      "newsletter": "Newsletter",
+      "article": "Articulo"
+    },
+    "status": {
+      "ready": "Listo",
+      "enriching": "Enriqueciendo",
+      "processing": "Procesando",
+      "extracted": "Extraido",
+      "queued": "En cola",
+      "failed": "Fallido"
+    },
+    "errors": {
+      "loadActivity": "No se pudo cargar la actividad",
+      "loadInbox": "No se pudo cargar la direccion",
+      "addOneUrl": "Agrega al menos una URL",
+      "saveLinks": "No se pudieron guardar los enlaces",
+      "copyInbox": "No se pudo copiar la direccion"
+    }
+  }
+}

@@ -1,0 +1,168 @@
+{
+  "landing": {
+    "nav": {
+      "features": "Features",
+      "pricing": "Pricing",
+      "openApp": "Open app",
+      "signIn": "Sign in",
+      "getStarted": "Get started"
+    },
+    "hero": {
+      "eyebrow": "Generic SaaS starter",
+      "title": "Ship your next SaaS faster.",
+      "subtitle": "A neutral frontend template with auth, i18n, and billing examples wired in.",
+      "primaryCta": "Create account",
+      "secondaryCta": "See pricing"
+    },
+    "features": {
+      "title": "Included examples",
+      "subtitle": "Minimal building blocks to start quickly without product-specific copy.",
+      "cards": {
+        "i18n": {
+          "title": "Localization",
+          "body": "Switch language from the header using i18next resources."
+        },
+        "auth": {
+          "title": "Authentication",
+          "body": "Email sign-in/sign-up flows are ready via Better Auth."
+        },
+        "billing": {
+          "title": "Subscriptions",
+          "body": "Pricing page supports Polar products and checkout flow."
+        }
+      }
+    },
+    "footer": {
+      "text": "Seed template for future SaaS projects.",
+      "pricing": "Pricing",
+      "login": "Sign in",
+      "register": "Create account"
+    }
+  },
+  "pricing": {
+    "title": "Pricing",
+    "subtitle": "Connect Polar products for live plans. Demo plans are shown until then.",
+    "loading": "Loading plans...",
+    "free": "Free",
+    "monthly": "/month",
+    "yearly": "/year",
+    "cta": "Continue",
+    "processing": "Processing..."
+  },
+  "common": {
+    "errors": {
+      "unexpected": "An unexpected error occurred",
+      "network": "Network error. Please try again.",
+      "apiUnavailable": "Service is temporarily unavailable. Please try again."
+    }
+  },
+  "auth": {
+    "fields": {
+      "name": "Name",
+      "namePlaceholder": "John Doe",
+      "email": "Email",
+      "emailPlaceholder": "you@example.com",
+      "password": "Password",
+      "passwordPlaceholder": "••••••••"
+    },
+    "login": {
+      "title": "Sign in",
+      "subtitle": "Access your workspace",
+      "actions": {
+        "signIn": "Sign In",
+        "signingIn": "Signing in..."
+      },
+      "errors": {
+        "failed": "Login failed"
+      },
+      "footer": {
+        "noAccount": "Don't have an account?",
+        "signUp": "Sign up"
+      }
+    },
+    "register": {
+      "title": "Create account",
+      "subtitle": "Set up your workspace",
+      "actions": {
+        "createAccount": "Create Account",
+        "creatingAccount": "Creating account..."
+      },
+      "errors": {
+        "failed": "Registration failed"
+      },
+      "footer": {
+        "hasAccount": "Already have an account?",
+        "signIn": "Sign in"
+      }
+    }
+  },
+  "protected": {
+    "sidebar": {
+      "toggle": "Toggle sidebar",
+      "settings": "Settings",
+      "profile": "Profile",
+      "billing": "Billing",
+      "apiKeys": "API Keys",
+      "logout": "Logout"
+    }
+  },
+  "dashboard": {
+    "header": {
+      "welcome": "Welcome back",
+      "userFallback": "User",
+      "freePlan": "Free Plan",
+      "premiumPlan": "Premium",
+      "syncing": "Syncing",
+      "live": "Live"
+    },
+    "links": {
+      "title": "Add new links",
+      "subtitle": "Drop links and we will craft a 10 min deep dive.",
+      "placeholder": "https://example.com/article\nhttps://another.com/post",
+      "save": "Save links",
+      "saving": "Saving..."
+    },
+    "inbox": {
+      "title": "Newsletter inbox",
+      "subtitle": "Forward newsletters to start generating stories.",
+      "loading": "Loading address...",
+      "copy": "Copy",
+      "copied": "Copied",
+      "unavailable": "Inbox not available"
+    },
+    "activity": {
+      "title": "Activity stream",
+      "subtitle": "Links and newsletters in motion.",
+      "loading": "Loading activity...",
+      "empty": "No activity yet. Add a link to start."
+    },
+    "stories": {
+      "title": "Your stories",
+      "subtitle": "Curated, long-form learning updates crafted for you.",
+      "emptyTitle": "No stories yet",
+      "emptyBody": "Drop a link or forward a newsletter to generate your first story.",
+      "minRead": "min read",
+      "read": "Read"
+    },
+    "labels": {
+      "link": "Link",
+      "newsletter": "Newsletter",
+      "article": "Article"
+    },
+    "status": {
+      "ready": "Ready",
+      "enriching": "Enriching",
+      "processing": "Processing",
+      "extracted": "Extracted",
+      "queued": "Queued",
+      "failed": "Failed"
+    },
+    "errors": {
+      "loadActivity": "Failed to load activity",
+      "loadInbox": "Failed to load inbox address",
+      "addOneUrl": "Add at least one URL",
+      "saveLinks": "Failed to save links",
+      "copyInbox": "Failed to copy inbox address"
+    }
+  }
+}

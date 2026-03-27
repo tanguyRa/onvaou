@@ -1,0 +1,101 @@
+services:
+  # ============================================
+  # Postgres (local dev/testing)
+  # ============================================
+  postgres:
+    image: postgres:16-alpine
+    container_name: ${PROJECT_NAME}-db
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 1s
+      timeout: 2s
+      retries: 10
+      start_period: 2s
+
+  # ============================================
+  # Go API Backend
+  # ============================================
+  back:
+    image: ${PROJECT_NAME}-back:${DOCKER_TAG:-dev}
+    pull_policy: missing
+    container_name: ${PROJECT_NAME}-back
+    build:
+      context: ./back
+      dockerfile: Dockerfile
+      target: ${DOCKER_TARGET:-production}
+      args:
+        TARGETOS: ${TARGETOS:-linux}
+        TARGETARCH: ${TARGETARCH:-amd64}
+    ports:
+      - "8080:8080"
+    environment:
+      - PROJECT_NAME=${PROJECT_NAME}
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?sslmode=disable
+      # Auth
+      - BETTER_AUTH_SECRET=${BETTER_AUTH_SECRET}
+      #  Payments
+      - PAYMENT_PROVIDER=${PAYMENT_PROVIDER:-polar}
+      - POLAR_WEBHOOK_SECRET=${POLAR_WEBHOOK_SECRET}
+      # LLM
+      - LLM_PROVIDER=${LLM_PROVIDER}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - GEMINI_MODEL=${GEMINI_MODEL}
+      # Storage
+      - STORAGE_PROVIDER=${STORAGE_PROVIDER:-minio}
+      - MINIO_ENDPOINT=${MINIO_ENDPOINT:-minio:9000}
+      - MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY:-minioadmin}
+      - MINIO_SECRET_KEY=${MINIO_SECRET_KEY:-minioadmin}
+      - MINIO_BUCKET=${MINIO_BUCKET:-bucket}
+      - MINIO_USE_SSL=${MINIO_USE_SSL:-false}
+      - MINIO_PUBLIC_BASE_URL=${MINIO_PUBLIC_BASE_URL:-http://127.0.0.1:9000/bucket}
+      # Front<->back security
+      - JWT_ISSUER=${JWT_ISSUER}
+      - JWT_AUDIENCE=${JWT_AUDIENCE}
+      - CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS}
+    volumes:
+      - ./back:/app
+      - ./db:/db
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # ============================================
+  # SvelteKit Frontend
+  # ============================================
+  front:
+    image: ${PROJECT_NAME}-front:${DOCKER_TAG:-dev}
+    pull_policy: missing
+    container_name: ${PROJECT_NAME}-front
+    build:
+      context: ./front
+      dockerfile: Dockerfile
+      target: ${DOCKER_TARGET:-production}
+    ports:
+      - "3000:5173"
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?sslmode=disable
+      - ORIGIN=${ORIGIN:-http://127.0.0.1:3000}
+      - GO_API_URL=${GO_API_URL:-http://${PROJECT_NAME}-back:8080}
+      - BETTER_AUTH_SECRET=${BETTER_AUTH_SECRET}
+      # Payments
+      - PAYMENT_PROVIDER=${PAYMENT_PROVIDER}
+      - PUBLIC_PAYMENT_PROVIDER=${PAYMENT_PROVIDER}
+      - PAYMENT_SUCCESS_URL=${PAYMENT_SUCCESS_URL}
+      - PAYMENT_CANCEL_URL=${PAYMENT_CANCEL_URL}
+
+      - POLAR_ACCESS_TOKEN=${POLAR_ACCESS_TOKEN}
+      - POLAR_SERVER=${POLAR_SERVER:-sandbox}
+    volumes:
+      - ./front:/app
+      - /app/node_modules
+      - /app/.svelte-kit
+    depends_on:
+      - back

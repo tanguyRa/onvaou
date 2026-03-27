@@ -1,0 +1,168 @@
+{
+  "landing": {
+    "nav": {
+      "features": "Fonctionnalites",
+      "pricing": "Tarifs",
+      "openApp": "Ouvrir l'app",
+      "signIn": "Connexion",
+      "getStarted": "Commencer"
+    },
+    "hero": {
+      "eyebrow": "Base SaaS generique",
+      "title": "Lancez votre prochain SaaS plus vite.",
+      "subtitle": "Template frontend neutre avec auth, i18n et billing pre-cables.",
+      "primaryCta": "Creer un compte",
+      "secondaryCta": "Voir les tarifs"
+    },
+    "features": {
+      "title": "Exemples inclus",
+      "subtitle": "Blocs minimaux pour demarrer vite, sans contenu produit.",
+      "cards": {
+        "i18n": {
+          "title": "Localisation",
+          "body": "Changez de langue depuis l'en-tete avec i18next."
+        },
+        "auth": {
+          "title": "Authentification",
+          "body": "Flux email connexion/inscription via Better Auth."
+        },
+        "billing": {
+          "title": "Abonnements",
+          "body": "La page tarifs supporte Polar et le checkout."
+        }
+      }
+    },
+    "footer": {
+      "text": "Template de base pour futurs projets SaaS.",
+      "pricing": "Tarifs",
+      "login": "Connexion",
+      "register": "Creer un compte"
+    }
+  },
+  "pricing": {
+    "title": "Tarifs",
+    "subtitle": "Connectez vos produits Polar pour des offres reelles. Sinon, des plans demo sont affiches.",
+    "loading": "Chargement des offres...",
+    "free": "Gratuit",
+    "monthly": "/mois",
+    "yearly": "/an",
+    "cta": "Continuer",
+    "processing": "Traitement..."
+  },
+  "common": {
+    "errors": {
+      "unexpected": "Une erreur inattendue est survenue",
+      "network": "Erreur reseau. Reessayez.",
+      "apiUnavailable": "Le service est temporairement indisponible. Reessayez."
+    }
+  },
+  "auth": {
+    "fields": {
+      "name": "Nom",
+      "namePlaceholder": "Jean Dupont",
+      "email": "Email",
+      "emailPlaceholder": "vous@example.com",
+      "password": "Mot de passe",
+      "passwordPlaceholder": "••••••••"
+    },
+    "login": {
+      "title": "Connexion",
+      "subtitle": "Accedez a votre espace",
+      "actions": {
+        "signIn": "Se connecter",
+        "signingIn": "Connexion..."
+      },
+      "errors": {
+        "failed": "Echec de connexion"
+      },
+      "footer": {
+        "noAccount": "Pas de compte ?",
+        "signUp": "Creer un compte"
+      }
+    },
+    "register": {
+      "title": "Creer un compte",
+      "subtitle": "Configurez votre espace",
+      "actions": {
+        "createAccount": "Creer le compte",
+        "creatingAccount": "Creation..."
+      },
+      "errors": {
+        "failed": "Echec de creation de compte"
+      },
+      "footer": {
+        "hasAccount": "Vous avez deja un compte ?",
+        "signIn": "Se connecter"
+      }
+    }
+  },
+  "protected": {
+    "sidebar": {
+      "toggle": "Basculer la barre laterale",
+      "settings": "Parametres",
+      "profile": "Profil",
+      "billing": "Facturation",
+      "apiKeys": "Cles API",
+      "logout": "Deconnexion"
+    }
+  },
+  "dashboard": {
+    "header": {
+      "welcome": "Bon retour",
+      "userFallback": "Utilisateur",
+      "freePlan": "Plan gratuit",
+      "premiumPlan": "Premium",
+      "syncing": "Synchronisation",
+      "live": "En direct"
+    },
+    "links": {
+      "title": "Ajouter des liens",
+      "subtitle": "Deposez des liens et nous creons un resume de 10 min.",
+      "placeholder": "https://example.com/article\nhttps://another.com/post",
+      "save": "Enregistrer les liens",
+      "saving": "Enregistrement..."
+    },
+    "inbox": {
+      "title": "Boite newsletters",
+      "subtitle": "Transferez des newsletters pour generer des stories.",
+      "loading": "Chargement de l adresse...",
+      "copy": "Copier",
+      "copied": "Copie",
+      "unavailable": "Boite indisponible"
+    },
+    "activity": {
+      "title": "Flux d activite",
+      "subtitle": "Liens et newsletters en cours.",
+      "loading": "Chargement de l activite...",
+      "empty": "Aucune activite. Ajoutez un lien pour commencer."
+    },
+    "stories": {
+      "title": "Vos stories",
+      "subtitle": "Mises a jour longues, organisees pour vous.",
+      "emptyTitle": "Aucune story",
+      "emptyBody": "Ajoutez un lien ou transferez une newsletter pour commencer.",
+      "minRead": "min de lecture",
+      "read": "Lire"
+    },
+    "labels": {
+      "link": "Lien",
+      "newsletter": "Newsletter",
+      "article": "Article"
+    },
+    "status": {
+      "ready": "Pret",
+      "enriching": "Enrichissement",
+      "processing": "Traitement",
+      "extracted": "Extrait",
+      "queued": "En file",
+      "failed": "Echec"
+    },
+    "errors": {
+      "loadActivity": "Echec du chargement de l activite",
+      "loadInbox": "Echec du chargement de la boite",
+      "addOneUrl": "Ajoutez au moins une URL",
+      "saveLinks": "Echec de sauvegarde des liens",
+      "copyInbox": "Echec de copie de l adresse"
+    }
+  }
+}
