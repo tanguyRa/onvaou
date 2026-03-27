@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/tanguyRa/saas_seed/internal/config"
+	"github.com/tanguyRa/onvaou/internal/config"
 
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"

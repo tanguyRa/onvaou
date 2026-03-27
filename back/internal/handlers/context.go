@@ -3,7 +3,7 @@ package handlers
 import (
 	"context"
 
-	"github.com/tanguyRa/saas_seed/internal/repository"
+	"github.com/tanguyRa/onvaou/internal/repository"
 )
 
 type queriesContextKey struct{}

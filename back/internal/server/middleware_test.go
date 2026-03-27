@@ -8,7 +8,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/tanguyRa/saas_seed/internal/session"
+	"github.com/tanguyRa/onvaou/internal/session"
 
 	"log/slog"
 

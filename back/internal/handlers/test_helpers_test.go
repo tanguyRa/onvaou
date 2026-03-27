@@ -12,8 +12,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/tanguyRa/saas_seed/internal/repository"
-	"github.com/tanguyRa/saas_seed/internal/session"
+	"github.com/tanguyRa/onvaou/internal/repository"
+	"github.com/tanguyRa/onvaou/internal/session"
 
 	"log/slog"
 

@@ -1,4 +1,4 @@
-# saas_seed
+# onvaou
 
 A full-stack SaaS starter kit with:
 - SvelteKit frontend (`front`)

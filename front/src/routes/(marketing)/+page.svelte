@@ -8,7 +8,7 @@
 
 <div class="landing">
     <header class="topbar row">
-        <a class="brand" href="/">SaaS Seed</a>
+        <a class="brand" href="/">OnVaOu</a>
         <nav class="row muted">
             <a href="#features">{t("landing.nav.features")}</a>
             <a href="/pricing">{t("landing.nav.pricing")}</a>

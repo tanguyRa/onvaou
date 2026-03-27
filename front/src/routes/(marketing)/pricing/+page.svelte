@@ -114,7 +114,7 @@
 
 <div class="pricing-page">
     <header>
-        <a href="/">SaaS Seed</a>
+        <a href="/">OnVaOu</a>
         <LanguageSwitcher />
     </header>
 

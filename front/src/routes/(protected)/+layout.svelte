@@ -64,10 +64,10 @@
     <div class="app-layout" class:collapsed={sidebarCollapsed}>
         <aside class="sidebar">
             <div class="sidebar-header">
-                <a href="/app" class="logo" aria-label="SaaS Seed home">
+                <a href="/app" class="logo" aria-label="OnVaOu home">
                     <span class="logo-mark"></span>
                     {#if !sidebarCollapsed}
-                        <span class="logo-text">SaaS Seed</span>
+                        <span class="logo-text">OnVaOu</span>
                     {/if}
                 </a>
                 <button

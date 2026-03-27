@@ -6,7 +6,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/tanguyRa/saas_seed/internal/session"
+	"github.com/tanguyRa/onvaou/internal/session"
 )
 
 func TestAuthUserFromRequest(t *testing.T) {

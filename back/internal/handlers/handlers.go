@@ -4,9 +4,9 @@ import (
 	"log/slog"
 	"net/http"
 
-	"github.com/tanguyRa/saas_seed/internal/config"
-	"github.com/tanguyRa/saas_seed/internal/providers/llmclient"
-	"github.com/tanguyRa/saas_seed/internal/repository"
+	"github.com/tanguyRa/onvaou/internal/config"
+	"github.com/tanguyRa/onvaou/internal/providers/llmclient"
+	"github.com/tanguyRa/onvaou/internal/repository"
 )
 
 type Handlers struct {

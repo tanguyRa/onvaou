@@ -6,9 +6,9 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/tanguyRa/saas_seed/internal/handlers"
-	"github.com/tanguyRa/saas_seed/internal/repository"
-	"github.com/tanguyRa/saas_seed/internal/session"
+	"github.com/tanguyRa/onvaou/internal/handlers"
+	"github.com/tanguyRa/onvaou/internal/repository"
+	"github.com/tanguyRa/onvaou/internal/session"
 
 	"github.com/google/uuid"
 	"github.com/lestrrat-go/jwx/v3/jwt"

@@ -6,9 +6,9 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/tanguyRa/saas_seed/internal/config"
-	"github.com/tanguyRa/saas_seed/internal/handlers"
-	"github.com/tanguyRa/saas_seed/internal/repository"
+	"github.com/tanguyRa/onvaou/internal/config"
+	"github.com/tanguyRa/onvaou/internal/handlers"
+	"github.com/tanguyRa/onvaou/internal/repository"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/lestrrat-go/jwx/v3/jwk"

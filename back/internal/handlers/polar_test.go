@@ -12,7 +12,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/tanguyRa/saas_seed/internal/config"
+	"github.com/tanguyRa/onvaou/internal/config"
 )
 
 func TestPolarWebhook(t *testing.T) {

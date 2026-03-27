@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/tanguyRa/saas_seed/internal/config"
-	"github.com/tanguyRa/saas_seed/internal/llm"
+	"github.com/tanguyRa/onvaou/internal/config"
+	"github.com/tanguyRa/onvaou/internal/llm"
 )
 
 type Client struct {

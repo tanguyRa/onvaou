@@ -40,7 +40,7 @@
 
 <section>
 	<header>
-		<a href="/" class="auth-logo">SaaS Seed</a>
+		<a href="/" class="auth-logo">OnVaOu</a>
 		<div>
 			<h1>{t("auth.login.title")}</h1>
 			<p>{t("auth.login.subtitle")}</p>
