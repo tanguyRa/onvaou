@@ -13,7 +13,7 @@ import (
 
 const createEvent = `-- name: CreateEvent :one
 INSERT INTO
-    "events" ("userId", "type", "data")
+    "system_events" ("userId", "type", "data")
 VALUES ($1, $2, $3)
 RETURNING
     id, "userId", data, type, "createdAt", "updatedAt"
@@ -25,9 +25,9 @@ type CreateEventParams struct {
 	Data   []byte    `json:"data"`
 }
 
-func (q *Queries) CreateEvent(ctx context.Context, arg CreateEventParams) (Event, error) {
+func (q *Queries) CreateEvent(ctx context.Context, arg CreateEventParams) (SystemEvent, error) {
 	row := q.db.QueryRow(ctx, createEvent, arg.UserId, arg.Type, arg.Data)
-	var i Event
+	var i SystemEvent
 	err := row.Scan(
 		&i.ID,
 		&i.UserId,
@@ -41,7 +41,7 @@ func (q *Queries) CreateEvent(ctx context.Context, arg CreateEventParams) (Event
 
 const createEventWithId = `-- name: CreateEventWithId :one
 INSERT INTO
-    "events" (
+    "system_events" (
         "id",
         "userId",
         "type",
@@ -59,14 +59,14 @@ type CreateEventWithIdParams struct {
 	Data   []byte    `json:"data"`
 }
 
-func (q *Queries) CreateEventWithId(ctx context.Context, arg CreateEventWithIdParams) (Event, error) {
+func (q *Queries) CreateEventWithId(ctx context.Context, arg CreateEventWithIdParams) (SystemEvent, error) {
 	row := q.db.QueryRow(ctx, createEventWithId,
 		arg.ID,
 		arg.UserId,
 		arg.Type,
 		arg.Data,
 	)
-	var i Event
+	var i SystemEvent
 	err := row.Scan(
 		&i.ID,
 		&i.UserId,
@@ -79,12 +79,12 @@ func (q *Queries) CreateEventWithId(ctx context.Context, arg CreateEventWithIdPa
 }
 
 const getEventByID = `-- name: GetEventByID :one
-SELECT id, "userId", data, type, "createdAt", "updatedAt" FROM "events" WHERE id = $1
+SELECT id, "userId", data, type, "createdAt", "updatedAt" FROM "system_events" WHERE id = $1
 `
 
-func (q *Queries) GetEventByID(ctx context.Context, id uuid.UUID) (Event, error) {
+func (q *Queries) GetEventByID(ctx context.Context, id uuid.UUID) (SystemEvent, error) {
 	row := q.db.QueryRow(ctx, getEventByID, id)
-	var i Event
+	var i SystemEvent
 	err := row.Scan(
 		&i.ID,
 		&i.UserId,
@@ -97,7 +97,7 @@ func (q *Queries) GetEventByID(ctx context.Context, id uuid.UUID) (Event, error)
 }
 
 const getEventByUserIDAndType = `-- name: GetEventByUserIDAndType :one
-SELECT id, "userId", data, type, "createdAt", "updatedAt" FROM "events" WHERE "userId" = $1 AND "type" = $2
+SELECT id, "userId", data, type, "createdAt", "updatedAt" FROM "system_events" WHERE "userId" = $1 AND "type" = $2
 `
 
 type GetEventByUserIDAndTypeParams struct {
@@ -105,9 +105,9 @@ type GetEventByUserIDAndTypeParams struct {
 	Type   string    `json:"type"`
 }
 
-func (q *Queries) GetEventByUserIDAndType(ctx context.Context, arg GetEventByUserIDAndTypeParams) (Event, error) {
+func (q *Queries) GetEventByUserIDAndType(ctx context.Context, arg GetEventByUserIDAndTypeParams) (SystemEvent, error) {
 	row := q.db.QueryRow(ctx, getEventByUserIDAndType, arg.UserId, arg.Type)
-	var i Event
+	var i SystemEvent
 	err := row.Scan(
 		&i.ID,
 		&i.UserId,
@@ -120,18 +120,18 @@ func (q *Queries) GetEventByUserIDAndType(ctx context.Context, arg GetEventByUse
 }
 
 const listEventsByUserID = `-- name: ListEventsByUserID :many
-SELECT id, "userId", data, type, "createdAt", "updatedAt" FROM "events" WHERE "userId" = $1 ORDER BY "createdAt" DESC
+SELECT id, "userId", data, type, "createdAt", "updatedAt" FROM "system_events" WHERE "userId" = $1 ORDER BY "createdAt" DESC
 `
 
-func (q *Queries) ListEventsByUserID(ctx context.Context, userid uuid.UUID) ([]Event, error) {
+func (q *Queries) ListEventsByUserID(ctx context.Context, userid uuid.UUID) ([]SystemEvent, error) {
 	rows, err := q.db.Query(ctx, listEventsByUserID, userid)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Event
+	var items []SystemEvent
 	for rows.Next() {
-		var i Event
+		var i SystemEvent
 		if err := rows.Scan(
 			&i.ID,
 			&i.UserId,

@@ -46,6 +46,7 @@ app/
     │   ├── auth_sessions.sql.go
     │   ├── auth_users.sql.go
     │   ├── db.go
+    │   ├── events.sql.go
     │   ├── models.go
     │   ├── pay_events.sql.go
     │   └── pay_subscriptions.sql.go

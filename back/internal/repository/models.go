@@ -27,12 +27,17 @@ type Account struct {
 }
 
 type Event struct {
-	ID        uuid.UUID `json:"id"`
-	UserId    uuid.UUID `json:"userId"`
-	Data      []byte    `json:"data"`
-	Type      string    `json:"type"`
-	CreatedAt time.Time `json:"createdAt"`
-	UpdatedAt time.Time `json:"updatedAt"`
+	EventID      uuid.UUID   `json:"event_id"`
+	Title        string      `json:"title"`
+	Description  string      `json:"description"`
+	StartDt      time.Time   `json:"start_dt"`
+	EndDt        *time.Time  `json:"end_dt"`
+	LocationName string      `json:"location_name"`
+	Address      string      `json:"address"`
+	Geom         interface{} `json:"geom"`
+	SourceTag    string      `json:"source_tag"`
+	SourceUrl    string      `json:"source_url"`
+	CreatedAt    time.Time   `json:"created_at"`
 }
 
 type Jwk struct {
@@ -55,6 +60,12 @@ type Session struct {
 	UpdatedAt time.Time `json:"updatedAt"`
 }
 
+type SourceHash struct {
+	SourceTag   string    `json:"source_tag"`
+	ContentHash string    `json:"content_hash"`
+	EventID     uuid.UUID `json:"event_id"`
+}
+
 type Subscription struct {
 	ID                uuid.UUID  `json:"id"`
 	UserId            uuid.UUID  `json:"userId"`
@@ -65,6 +76,15 @@ type Subscription struct {
 	CurrentPeriodEnd  *time.Time `json:"currentPeriodEnd"`
 	CreatedAt         time.Time  `json:"createdAt"`
 	UpdatedAt         time.Time  `json:"updatedAt"`
+}
+
+type SystemEvent struct {
+	ID        uuid.UUID `json:"id"`
+	UserId    uuid.UUID `json:"userId"`
+	Data      []byte    `json:"data"`
+	Type      string    `json:"type"`
+	CreatedAt time.Time `json:"createdAt"`
+	UpdatedAt time.Time `json:"updatedAt"`
 }
 
 type User struct {

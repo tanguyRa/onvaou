@@ -13,8 +13,8 @@ CREATE TABLE "subscription" (
     "updatedAt" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
--- Events table
-CREATE TABLE "events" (
+-- System events table
+CREATE TABLE "system_events" (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid (),
     "userId" UUID NOT NULL REFERENCES "user" (id) ON DELETE CASCADE,
     "data" JSONB NOT NULL,
@@ -26,6 +26,6 @@ CREATE TABLE "events" (
 -- Indexes
 CREATE INDEX idx_subscription_user_id ON "subscription" ("userId");
 
-CREATE INDEX idx_events_type ON "events" ("userId", "type");
+CREATE INDEX idx_system_events_type ON "system_events" ("userId", "type");
 
 COMMIT;

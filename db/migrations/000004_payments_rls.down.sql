@@ -24,12 +24,12 @@ BEGIN
         SELECT policyname
         FROM pg_policies
         WHERE schemaname = current_schema()
-          AND tablename = 'events'
+          AND tablename = 'system_events'
     LOOP
-        EXECUTE format('DROP POLICY IF EXISTS %I ON "events";', policy_record.policyname);
+        EXECUTE format('DROP POLICY IF EXISTS %I ON "system_events";', policy_record.policyname);
     END LOOP;
 END $$;
 
-ALTER TABLE "events" DISABLE ROW LEVEL SECURITY;
+ALTER TABLE "system_events" DISABLE ROW LEVEL SECURITY;
 
 COMMIT;

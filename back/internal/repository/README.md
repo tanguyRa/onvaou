@@ -42,23 +42,29 @@ repository/
 │   ├── type Queries {db: DBTX}
 │   ├── func New(db DBTX) *Queries
 │   └── func (*Queries) WithTx(tx pgx.Tx) *Queries
+├── events.sql.go
+│   ├── type ListUpcomingGeoEventsRow {EventID: uuid.UUID, Title: string, StartDt: time.Time, LocationName: string, SourceTag: string, SourceUrl: string}
+│   ├── func (*Queries) CountGeoEvents(ctx context.Context) (int64, error)
+│   └── func (*Queries) ListUpcomingGeoEvents(ctx context.Context, limit int32) ([]ListUpcomingGeoEventsRow, error)
 ├── models.go
 │   ├── type Account {ID: uuid.UUID, UserId: uuid.UUID, AccountId: string, ProviderId: string, AccessToken: *string, RefreshToken: *string, AccessTokenExpiresAt: *time.Time, RefreshTokenExpiresAt: *time.Time, Scope: *string, IdToken: *string, Password: *string, CreatedAt: time.Time, UpdatedAt: time.Time}
-│   ├── type Event {ID: uuid.UUID, UserId: uuid.UUID, Data: []byte, Type: string, CreatedAt: time.Time, UpdatedAt: time.Time}
+│   ├── type Event {EventID: uuid.UUID, Title: string, Description: string, StartDt: time.Time, EndDt: *time.Time, LocationName: string, Address: string, Geom: interface{}, SourceTag: string, SourceUrl: string, CreatedAt: time.Time}
 │   ├── type Jwk {ID: uuid.UUID, UserId: *uuid.UUID, PublicKey: string, PrivateKey: string, CreatedAt: time.Time, ExpiresAt: *time.Time}
 │   ├── type Session {ID: uuid.UUID, UserId: uuid.UUID, Token: string, ExpiresAt: time.Time, IpAddress: *string, UserAgent: *string, CreatedAt: time.Time, UpdatedAt: time.Time}
+│   ├── type SourceHash {SourceTag: string, ContentHash: string, EventID: uuid.UUID}
 │   ├── type Subscription {ID: uuid.UUID, UserId: uuid.UUID, ExternalId: *string, Tier: string, CancelAtPeriodEnd: bool, Status: string, CurrentPeriodEnd: *time.Time, CreatedAt: time.Time, UpdatedAt: time.Time}
+│   ├── type SystemEvent {ID: uuid.UUID, UserId: uuid.UUID, Data: []byte, Type: string, CreatedAt: time.Time, UpdatedAt: time.Time}
 │   ├── type User {ID: uuid.UUID, Name: string, Email: string, EmailVerified: bool, Image: *string, CreatedAt: time.Time, UpdatedAt: time.Time}
 │   └── type Verification {ID: uuid.UUID, UserId: uuid.UUID, Identifier: string, Value: string, ExpiresAt: time.Time, CreatedAt: time.Time, UpdatedAt: time.Time}
 ├── pay_events.sql.go
 │   ├── type CreateEventParams {UserId: uuid.UUID, Type: string, Data: []byte}
 │   ├── type CreateEventWithIdParams {ID: uuid.UUID, UserId: uuid.UUID, Type: string, Data: []byte}
 │   ├── type GetEventByUserIDAndTypeParams {UserId: uuid.UUID, Type: string}
-│   ├── func (*Queries) CreateEvent(ctx context.Context, arg CreateEventParams) (Event, error)
-│   ├── func (*Queries) CreateEventWithId(ctx context.Context, arg CreateEventWithIdParams) (Event, error)
-│   ├── func (*Queries) GetEventByID(ctx context.Context, id uuid.UUID) (Event, error)
-│   ├── func (*Queries) GetEventByUserIDAndType(ctx context.Context, arg GetEventByUserIDAndTypeParams) (Event, error)
-│   └── func (*Queries) ListEventsByUserID(ctx context.Context, userid uuid.UUID) ([]Event, error)
+│   ├── func (*Queries) CreateEvent(ctx context.Context, arg CreateEventParams) (SystemEvent, error)
+│   ├── func (*Queries) CreateEventWithId(ctx context.Context, arg CreateEventWithIdParams) (SystemEvent, error)
+│   ├── func (*Queries) GetEventByID(ctx context.Context, id uuid.UUID) (SystemEvent, error)
+│   ├── func (*Queries) GetEventByUserIDAndType(ctx context.Context, arg GetEventByUserIDAndTypeParams) (SystemEvent, error)
+│   └── func (*Queries) ListEventsByUserID(ctx context.Context, userid uuid.UUID) ([]SystemEvent, error)
 └── pay_subscriptions.sql.go
     ├── type CreateSubscriptionParams {UserId: uuid.UUID, ExternalId: *string, Tier: string, CancelAtPeriodEnd: bool, Status: string, CurrentPeriodEnd: *time.Time}
     ├── type CreateSubscriptionWithIdParams {ID: uuid.UUID, UserId: uuid.UUID, ExternalId: *string, Tier: string, CancelAtPeriodEnd: bool, Status: string, CurrentPeriodEnd: *time.Time}
