@@ -4,6 +4,4 @@ DROP TABLE IF EXISTS "source_hashes";
 
 DROP TABLE IF EXISTS "events";
 
-DROP EXTENSION IF EXISTS postgis;
-
 COMMIT;

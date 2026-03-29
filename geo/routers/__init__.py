@@ -1,3 +1,3 @@
-from routers import events, health
+from routers import events, health, ingestion
 
-__all__ = ["events", "health"]
+__all__ = ["events", "health", "ingestion"]
