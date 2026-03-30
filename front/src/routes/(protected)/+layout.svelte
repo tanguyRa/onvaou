@@ -1,25 +1,48 @@
 <script lang="ts">
+    import { onMount } from "svelte";
     import type { LayoutProps } from "./$types";
     import { signOut } from "$lib/auth-client";
     import { t } from "$lib/i18n/index.svelte";
     import { useUser, resetUserStore } from "$lib/stores/user.svelte";
     import { goto } from "$app/navigation";
     import { page } from "$app/stores";
+    import Spinner from "$lib/components/Spinner.svelte";
 
     let { children }: LayoutProps = $props();
 
     const user = useUser();
 
     let sidebarCollapsed = $state(false);
+    let mobileNavOpen = $state(false);
+    let isMobileViewport = $state(false);
 
-    // Redirect to login if not authenticated
     $effect(() => {
         if (!user.state.isPending && !user.state.isAuthenticated) {
             goto("/login");
         }
     });
 
-    // Load collapsed state from localStorage on mount
+    $effect(() => {
+        if (typeof window === "undefined") {
+            return;
+        }
+
+        const mediaQuery = window.matchMedia("(max-width: 900px)");
+        const handleChange = () => {
+            isMobileViewport = mediaQuery.matches;
+            if (!mediaQuery.matches) {
+                mobileNavOpen = false;
+            }
+        };
+
+        handleChange();
+        mediaQuery.addEventListener("change", handleChange);
+
+        return () => {
+            mediaQuery.removeEventListener("change", handleChange);
+        };
+    });
+
     $effect(() => {
         if (typeof window !== "undefined") {
             const stored = localStorage.getItem("sidebar-collapsed");
@@ -29,7 +52,11 @@
         }
     });
 
-    // Persist collapsed state to localStorage
+    $effect(() => {
+        $page.url.pathname;
+        mobileNavOpen = false;
+    });
+
     function toggleSidebar() {
         sidebarCollapsed = !sidebarCollapsed;
         if (typeof window !== "undefined") {
@@ -37,13 +64,18 @@
         }
     }
 
-    async function handleLogout() {
+    function toggleMobileNav() {
+        mobileNavOpen = !mobileNavOpen;
+    }
+
+    async function handleLogout(event: MouseEvent) {
+        event.preventDefault();
+
         try {
             await signOut();
         } catch (e) {
             console.error("Logout error:", e);
         } finally {
-            // Always reset store and redirect, even if signOut fails
             resetUserStore();
             goto("/");
         }
@@ -56,54 +88,175 @@
 </script>
 
 {#if user.state.isPending || !user.state.isAuthenticated}
-    <!-- Show loading while checking auth or redirecting -->
     <div class="loading-container">
         <div class="spinner spinner-dark"></div>
     </div>
 {:else}
-    <div class="app-layout" class:collapsed={sidebarCollapsed}>
-        <aside class="sidebar">
+    <div
+        class="app-layout"
+        class:collapsed={sidebarCollapsed && !isMobileViewport}
+        class:mobile-nav-open={mobileNavOpen}
+    >
+        {#if isMobileViewport}
+            <button
+                class="sidebar-backdrop"
+                class:visible={mobileNavOpen}
+                onclick={() => (mobileNavOpen = false)}
+                aria-label="Close sidebar"
+            ></button>
+        {/if}
+
+        <aside
+            id="protected-sidebar"
+            class="sidebar"
+            class:open={mobileNavOpen}
+        >
             <div class="sidebar-header">
-                <a href="/app" class="logo" aria-label="OnVaOu home">
+                <a href="/app" class="logo" aria-label="SaaS Seed home">
                     <span class="logo-mark"></span>
-                    {#if !sidebarCollapsed}
+                    {#if !sidebarCollapsed || isMobileViewport}
                         <span class="logo-text">OnVaOu</span>
                     {/if}
                 </a>
-                <button
-                    class="toggle-btn"
-                    onclick={toggleSidebar}
-                    aria-label={t("protected.sidebar.toggle")}
-                >
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="20"
-                        height="20"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
+
+                {#if isMobileViewport}
+                    <button
+                        class="toggle-btn"
+                        onclick={() => (mobileNavOpen = false)}
+                        aria-label="Close menu"
                     >
-                        {#if sidebarCollapsed}
-                            <polyline points="9 18 15 12 9 6"></polyline>
-                        {:else}
-                            <polyline points="15 18 9 12 15 6"></polyline>
-                        {/if}
-                    </svg>
-                </button>
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="20"
+                            height="20"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        >
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                {:else}
+                    <button
+                        class="toggle-btn"
+                        onclick={toggleSidebar}
+                        aria-label={t("protected.sidebar.toggle")}
+                    >
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="20"
+                            height="20"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        >
+                            {#if sidebarCollapsed}
+                                <polyline points="9 18 15 12 9 6"></polyline>
+                            {:else}
+                                <polyline points="15 18 9 12 15 6"></polyline>
+                            {/if}
+                        </svg>
+                    </button>
+                {/if}
             </div>
 
             <nav class="sidebar-nav">
-                <div class="nav-section"></div>
+                <div class="nav-section">
+                    <a
+                        href="/app"
+                        class="nav-link"
+                        aria-current={isCurrentPath("/app")
+                            ? "page"
+                            : undefined}
+                    >
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="20"
+                            height="20"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        >
+                            <rect x="3" y="3" width="7" height="7"></rect>
+                            <rect x="14" y="3" width="7" height="7"></rect>
+                            <rect x="14" y="14" width="7" height="7"></rect>
+                            <rect x="3" y="14" width="7" height="7"></rect>
+                        </svg>
+                        {#if !sidebarCollapsed || isMobileViewport}
+                            <span>Dashboard</span>
+                        {/if}
+                    </a>
+
+                    <a
+                        href="/app/map"
+                        class="nav-link"
+                        aria-current={isCurrentPath("/app/map")
+                            ? "page"
+                            : undefined}
+                    >
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="20"
+                            height="20"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        >
+                            <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"></polygon>
+                            <line x1="9" y1="3" x2="9" y2="18"></line>
+                            <line x1="15" y1="6" x2="15" y2="21"></line>
+                        </svg>
+                        {#if !sidebarCollapsed || isMobileViewport}
+                            <span>Map</span>
+                        {/if}
+                    </a>
+                </div>
 
                 <div class="nav-section nav-section-bottom">
                     <span class="nav-section-label"
-                        >{sidebarCollapsed
+                        >{sidebarCollapsed && !isMobileViewport
                             ? ""
                             : t("protected.sidebar.settings")}</span
                     >
+
+                    <a
+                        href="/settings/rules"
+                        class="nav-link"
+                        aria-current={isCurrentPath("/settings/rules")
+                            ? "page"
+                            : undefined}
+                    >
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="20"
+                            height="20"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        >
+                            <path d="M12 3l1.912 5.813L20 10.5l-4.95 3.6L16.962 20 12 16.9 7.038 20l1.912-5.9L4 10.5l6.088-1.687z"></path>
+                        </svg>
+                        {#if !sidebarCollapsed || isMobileViewport}
+                            <span>Auto-tag rules</span>
+                        {/if}
+                    </a>
+
                     <a
                         href="/settings/profile"
                         class="nav-link"
@@ -126,10 +279,11 @@
                             ></path>
                             <circle cx="12" cy="7" r="4"></circle>
                         </svg>
-                        {#if !sidebarCollapsed}
+                        {#if !sidebarCollapsed || isMobileViewport}
                             <span>{t("protected.sidebar.profile")}</span>
                         {/if}
                     </a>
+
                     <a
                         href="/settings/billing"
                         class="nav-link"
@@ -158,36 +312,11 @@
                             ></rect>
                             <line x1="1" y1="10" x2="23" y2="10"></line>
                         </svg>
-                        {#if !sidebarCollapsed}
+                        {#if !sidebarCollapsed || isMobileViewport}
                             <span>{t("protected.sidebar.billing")}</span>
                         {/if}
                     </a>
-                    <a
-                        href="/settings/api-keys"
-                        class="nav-link"
-                        aria-current={isCurrentPath("/settings/api-keys")
-                            ? "page"
-                            : undefined}
-                    >
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="20"
-                            height="20"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                        >
-                            <path
-                                d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"
-                            ></path>
-                        </svg>
-                        {#if !sidebarCollapsed}
-                            <span>{t("protected.sidebar.apiKeys")}</span>
-                        {/if}
-                    </a>
+
                     <a
                         href="/"
                         class="nav-link logout-btn"
@@ -210,7 +339,7 @@
                             <polyline points="16 17 21 12 16 7"></polyline>
                             <line x1="21" y1="12" x2="9" y2="12"></line>
                         </svg>
-                        {#if !sidebarCollapsed}
+                        {#if !sidebarCollapsed || isMobileViewport}
                             <span>{t("protected.sidebar.logout")}</span>
                         {/if}
                     </a>
@@ -219,13 +348,41 @@
         </aside>
 
         <main class="main-content">
-            {@render children()}
+            <div class="mobile-topbar">
+                <button
+                    class="mobile-menu-btn"
+                    onclick={toggleMobileNav}
+                    aria-expanded={mobileNavOpen}
+                    aria-controls="protected-sidebar"
+                    aria-label="Open menu"
+                >
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    >
+                        <line x1="3" y1="12" x2="21" y2="12"></line>
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <line x1="3" y1="18" x2="21" y2="18"></line>
+                    </svg>
+                </button>
+                <a href="/app" class="mobile-title">OnVaOu</a>
+            </div>
+
+            <div class="main-shell" class:map-shell={isCurrentPath("/app/map")}>
+                {@render children()}
+            </div>
         </main>
     </div>
 {/if}
 
 <style>
-    /* Loading State */
     .loading-container {
         min-height: 100vh;
         display: flex;
@@ -234,45 +391,51 @@
         background: var(--color-surface-alt);
     }
 
-    /* App Layout */
     .app-layout {
         display: flex;
-        height: 100vh;
+        height: 100dvh;
+        background: var(--color-surface);
+        position: relative;
+        overflow: hidden;
     }
 
-    /* Sidebar */
     .sidebar {
-        width: 240px;
-        height: 100%;
-        background: var(--color-bg);
+        width: 248px;
+        height: 100dvh;
+        background: linear-gradient(180deg, var(--color-bg) 0%, #f3f2ef 100%);
         border-right: 1px solid var(--color-border);
         display: flex;
         flex-direction: column;
-        transition: width 0.3s ease;
+        transition:
+            width var(--duration-base) var(--ease-standard),
+            transform var(--duration-base) var(--ease-standard);
+        z-index: 20;
+        flex-shrink: 0;
     }
 
     .app-layout.collapsed .sidebar {
-        width: 72px;
+        width: 76px;
     }
 
     .sidebar-header {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: var(--lg);
+        gap: var(--space-3);
+        padding: var(--space-4);
         border-bottom: 1px solid var(--color-border);
     }
 
-    .sidebar-header .logo {
+    .logo {
         display: flex;
         align-items: center;
-        gap: 0.75rem;
-        text-decoration: none;
+        gap: var(--space-3);
         color: var(--color-text);
         overflow: hidden;
+        min-width: 0;
     }
 
-    .sidebar-header .logo-mark {
+    .logo-mark {
         width: 26px;
         height: 26px;
         background: var(--color-text);
@@ -281,7 +444,7 @@
         flex-shrink: 0;
     }
 
-    .sidebar-header .logo-mark::after {
+    .logo-mark::after {
         content: "";
         position: absolute;
         inset: 6px;
@@ -289,102 +452,163 @@
         clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
     }
 
-    .sidebar-header .logo-text {
-        font-size: 1.05rem;
+    .logo-text {
+        font-size: var(--text-lg);
         font-weight: 700;
         letter-spacing: 0.02em;
-        font-family: "Canela", "Iowan Old Style", "Palatino Linotype",
-            "Book Antiqua", Palatino, serif;
+        font-family: var(--font-display);
         white-space: nowrap;
     }
 
-    .toggle-btn {
-        background: none;
-        border: none;
-        padding: var(--spacing-sm);
-        border-radius: var(--radius-sm);
+    .toggle-btn,
+    .mobile-menu-btn {
+        background: transparent;
+        border: 1px solid transparent;
+        padding: var(--space-2);
+        border-radius: var(--radius-md);
         cursor: pointer;
         color: var(--color-text-muted);
-        transition: all 0.1s ease;
-        display: flex;
+        transition:
+            background var(--duration-fast) var(--ease-standard),
+            color var(--duration-fast) var(--ease-standard),
+            border-color var(--duration-fast) var(--ease-standard);
+        display: inline-flex;
         align-items: center;
         justify-content: center;
-        flex-shrink: 0;
     }
 
-    .toggle-btn:hover {
-        background: var(--color-border);
+    .toggle-btn:hover,
+    .mobile-menu-btn:hover {
+        background: var(--color-surface);
+        border-color: var(--color-border);
         color: var(--color-text);
-    }
-
-    .app-layout.collapsed .toggle-btn {
-        margin-left: auto;
-        margin-right: auto;
     }
 
     .app-layout.collapsed .sidebar-header {
         flex-direction: column;
-        gap: var(--sm);
+        gap: var(--space-2);
     }
 
-    /* Sidebar Navigation */
     .sidebar-nav {
         flex: 1;
         display: flex;
         flex-direction: column;
-        padding: var(--md);
+        padding: var(--space-3);
         overflow-y: auto;
     }
 
     .nav-section {
         display: flex;
         flex-direction: column;
-        gap: var(--xs);
+        gap: var(--space-2);
+    }
+
+    .nav-subsection,
+    .quick-actions {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-2);
+        margin-top: var(--space-2);
+        padding-left: var(--space-4);
     }
 
     .nav-section-bottom {
         margin-top: auto;
         border-top: 1px solid var(--color-border);
-        padding-top: var(--md);
+        padding-top: var(--space-4);
     }
 
     .nav-section-label {
-        font-size: var(--xs);
-        font-weight: 600;
+        font-size: var(--text-sm);
+        font-weight: 700;
         text-transform: uppercase;
-        letter-spacing: 0.5px;
+        letter-spacing: 0.08em;
         color: var(--color-text-muted);
-        padding: var(--sm) var(--sm);
-        min-height: 24px;
+        padding: 0 var(--space-2);
+        min-height: 20px;
     }
 
     .nav-link {
         display: flex;
         align-items: center;
-        gap: var(--xs);
-        /* padding: var(--xs) var(--sm); */
-        border-radius: var(--md);
-        color: var(--color-text-soft);
-        text-decoration: none;
-        font-weight: 500;
-        transition: all 0.1s ease;
-        background: none;
-        border: none;
-        width: 100%;
+        gap: var(--space-3);
+        padding: var(--space-2) var(--space-3);
+        border-radius: var(--radius-md);
+        color: var(--color-text-muted);
+        font-weight: 600;
+        font-size: var(--text-md);
+        transition:
+            background var(--duration-fast) var(--ease-standard),
+            color var(--duration-fast) var(--ease-standard),
+        box-shadow var(--duration-fast) var(--ease-standard);
+    }
+
+    .nav-sublink,
+    .quick-action-btn {
+        display: flex;
+        align-items: center;
+        gap: var(--space-2);
+        justify-content: space-between;
+        padding: 0.5rem 0.75rem;
+        border-radius: var(--radius-md);
+        color: var(--color-text-muted);
+        font-size: var(--text-sm);
+        font-weight: 600;
+        border: 1px solid transparent;
+        background: transparent;
+        text-align: left;
+    }
+
+    .quick-action-btn {
         cursor: pointer;
-        font-size: var(--font-size-base);
-        font-family: var(--font-family);
+        color: var(--color-text);
+        background: var(--color-surface);
+        border-color: var(--color-border);
+    }
+
+    .quick-action-btn:disabled {
+        opacity: 0.7;
+        cursor: wait;
+    }
+
+    .nav-sublink[aria-current="page"] {
+        color: var(--color-text);
+        background: var(--color-surface);
+        border-color: var(--color-border);
+    }
+
+    .nav-sublink:hover,
+    .quick-action-btn:hover {
+        background: var(--color-surface);
+        color: var(--color-text);
+    }
+
+    .nav-sublink-tag {
+        justify-content: flex-start;
+    }
+
+    .tag-swatch {
+        width: 0.6rem;
+        height: 0.6rem;
+        border-radius: 999px;
+        background: var(--tag-color);
+        flex: 0 0 auto;
+    }
+
+    .nav-count {
+        padding: 0.15rem 0.5rem;
+        font-size: 0.72rem;
     }
 
     .nav-link[aria-current="page"] {
-        background: var(--color-primary-100);
+        background: var(--color-primary-soft);
         color: var(--color-text);
         box-shadow: inset 3px 0 0 var(--color-primary);
     }
 
     .nav-link:hover,
     .nav-link[aria-current="page"]:hover {
-        background: var(--color-border-light);
+        background: var(--color-surface);
         color: var(--color-text);
     }
 
@@ -395,41 +619,122 @@
     .nav-link span {
         white-space: nowrap;
         overflow: hidden;
+        text-overflow: ellipsis;
     }
 
     .app-layout.collapsed .nav-link {
         justify-content: center;
-        padding: var(--spacing-sm);
+        padding: var(--space-2);
     }
 
-    .logout-btn {
-        color: var(--color-error);
+    .logout-btn,
+    .logout-btn:hover {
+        color: var(--color-danger);
     }
 
     .logout-btn:hover {
-        background: var(--color-error-bg);
-        color: var(--color-error);
+        background: var(--color-danger-bg);
     }
 
-    /* Main Content */
+    .sidebar-backdrop {
+        display: none;
+    }
+
     .main-content {
         flex: 1;
+        min-width: 0;
+        height: 100dvh;
         background: var(--color-surface);
-        height: 100vh;
-        transition: margin-left var(--transition-slow);
-        overflow-y: auto;
-        padding: var(--xxl);
+        overflow: hidden;
     }
 
-    /* Responsive */
-    @media (max-width: 768px) {
+    .main-shell {
+        height: 100%;
+        overflow-y: auto;
+        padding: var(--space-4);
+    }
+
+    .main-shell.map-shell {
+        padding: 0;
+        overflow: hidden;
+    }
+
+    .mobile-topbar {
+        display: none;
+    }
+
+    @media (max-width: 900px) {
+        .app-layout {
+            height: 100dvh;
+        }
+
         .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: min(86vw, 290px);
             transform: translateX(-100%);
-            width: 240px !important;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .sidebar.open {
+            transform: translateX(0);
+        }
+
+        .sidebar-backdrop {
+            display: block;
+            position: fixed;
+            inset: 0;
+            border: 0;
+            background: rgba(17, 24, 39, 0.42);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity var(--duration-base) var(--ease-standard);
+            z-index: 10;
+        }
+
+        .sidebar-backdrop.visible {
+            opacity: 1;
+            pointer-events: auto;
         }
 
         .main-content {
-            margin-left: 0 !important;
+            height: 100dvh;
+        }
+
+        .main-shell {
+            height: calc(100% - 61px);
+            padding: var(--space-2);
+        }
+
+        .main-shell.map-shell {
+            padding: 0;
+        }
+
+        .mobile-topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: var(--space-3);
+            position: sticky;
+            top: 0;
+            z-index: 5;
+            padding: var(--space-3) var(--space-4);
+            background: color-mix(
+                in srgb,
+                var(--color-surface) 92%,
+                transparent
+            );
+            backdrop-filter: blur(6px);
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .mobile-title {
+            font-family: var(--font-display);
+            font-size: var(--text-lg);
+            font-weight: 700;
+            color: var(--color-text);
         }
     }
 </style>

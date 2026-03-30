@@ -1,142 +1,224 @@
 <script lang="ts">
+    import { onMount } from "svelte";
+
     import { useSession } from "$lib/auth-client";
+    import EventPanel from "$lib/components/map/EventPanel.svelte";
     import LanguageSwitcher from "$lib/components/LanguageSwitcher.svelte";
-    import { t } from "$lib/i18n/index.svelte";
+    import MapView from "$lib/components/map/MapView.svelte";
+    import RadiusSlider from "$lib/components/map/RadiusSlider.svelte";
+    import SearchBar from "$lib/components/map/SearchBar.svelte";
+    import { createMapDiscovery } from "$lib/components/map/discovery.svelte";
 
     const session = useSession();
+    const discovery = createMapDiscovery("Lyon");
+
+    onMount(() => {
+        void discovery.initialize();
+        return () => discovery.destroy();
+    });
 </script>
 
-<div class="landing">
-    <header class="topbar row">
-        <a class="brand" href="/">OnVaOu</a>
-        <nav class="row muted">
-            <a href="#features">{t("landing.nav.features")}</a>
-            <a href="/pricing">{t("landing.nav.pricing")}</a>
-        </nav>
-        <div class="actions row">
+<main class="landing-map" id="map">
+    <MapView
+        events={discovery.events}
+        center={discovery.center}
+        radiusKm={discovery.radiusKm}
+        selectedEventId={discovery.selectedEventId}
+        onSelect={(event) => discovery.selectEvent(event)}
+    />
+
+    <header class="landing-header" aria-label="Site header">
+        <div class="brand-block">
+            <a class="brand" href="/">OnVaOu</a>
+            <p class="brand-copy">
+                Search nearby public events before creating an account.
+            </p>
+        </div>
+
+        <div class="header-search">
+            <SearchBar
+                value={discovery.searchValue}
+                suggestions={discovery.suggestions}
+                loading={discovery.loadingSuggestions}
+                onInput={(value) => discovery.setSearchValue(value)}
+                onSelect={(city) => discovery.selectCity(city)}
+                onSubmit={() => discovery.submitSearch()}
+            />
+            <RadiusSlider
+                value={discovery.radiusKm}
+                onInput={(value) => discovery.setRadius(value)}
+            />
+        </div>
+
+        <nav class="header-actions" aria-label="Primary">
             <LanguageSwitcher />
             {#if $session.data?.user}
-                <a class="btn btn-ghost" href="/app">{t("landing.nav.openApp")}</a>
+                <a class="action-link" href="/app">Open app</a>
             {:else}
-                <a class="btn btn-ghost" href="/login">{t("landing.nav.signIn")}</a>
+                <a class="action-link" href="/login">Sign in</a>
             {/if}
-            <a class="btn primary" href="/register">{t("landing.nav.getStarted")}</a>
-        </div>
+            <a class="action-link primary" href="/register">Get started</a>
+        </nav>
     </header>
 
-    <article class="landing-main">
-        <section class="hero">
-            <p class="eyebrow primary">{t("landing.hero.eyebrow")}</p>
-            <h1>{t("landing.hero.title")}</h1>
-            <p class="muted">{t("landing.hero.subtitle")}</p>
-            <div class="hero-actions row">
-                <a class="btn primary" href="/register">{t("landing.hero.primaryCta")}</a>
-                <a class="btn secondary" href="/pricing">{t("landing.hero.secondaryCta")}</a>
-            </div>
-        </section>
+    <EventPanel
+        events={discovery.events}
+        total={discovery.total}
+        cityLabel={discovery.cityLabel}
+        radiusKm={discovery.radiusKm}
+        loading={discovery.loadingEvents}
+        selectedEventId={discovery.selectedEventId}
+        selectedEvent={discovery.selectedEvent}
+        detailLoading={discovery.detailLoading}
+        onSelect={(event) => discovery.selectEvent(event)}
+        onClose={(eventId) => discovery.closeEvent(eventId)}
+    />
 
-        <section id="features" class="features column">
-            <h2>{t("landing.features.title")}</h2>
-            <p class="muted">{t("landing.features.subtitle")}</p>
-            <div class="cards">
-                <article class="card feature-card">
-                    <h3>{t("landing.features.cards.i18n.title")}</h3>
-                    <p class="muted">{t("landing.features.cards.i18n.body")}</p>
-                </article>
-                <article class="card feature-card">
-                    <h3>{t("landing.features.cards.auth.title")}</h3>
-                    <p class="muted">{t("landing.features.cards.auth.body")}</p>
-                </article>
-                <article class="card feature-card">
-                    <h3>{t("landing.features.cards.billing.title")}</h3>
-                    <p class="muted">{t("landing.features.cards.billing.body")}</p>
-                </article>
-            </div>
-        </section>
-    </article>
-
-    <footer class="footer row muted">
-        <span>{t("landing.footer.text")}</span>
-        <div class="row">
-            <a href="/pricing">{t("landing.footer.pricing")}</a>
-            <a href="/login">{t("landing.footer.login")}</a>
-            <a href="/register">{t("landing.footer.register")}</a>
-        </div>
-    </footer>
-</div>
+    {#if discovery.error}
+        <output class="status-toast error">{discovery.error}</output>
+    {:else if discovery.loadingEvents && !discovery.hasResults}
+        <output class="status-toast">Loading nearby events...</output>
+    {:else if !discovery.loadingEvents && discovery.selectedCity && !discovery.hasResults}
+        <output class="status-toast">No events found in this radius yet.</output>
+    {/if}
+</main>
 
 <style>
-    .landing {
-        min-height: 100vh;
-        display: grid;
-        grid-template-rows: auto 1fr auto;
+    .landing-map {
+        position: relative;
+        width: 100vw;
+        height: 100vh;
+        overflow: hidden;
+        background: #f5f7fb;
     }
 
-    .topbar {
-        max-width: var(--container-xl);
-        margin: 0 auto;
-        padding: var(--xl);
-        flex-wrap: wrap;
+    .landing-header {
+        position: absolute;
+        inset: 1rem 1rem auto 1rem;
+        display: grid;
+        grid-template-columns: minmax(0, 18rem) minmax(0, 1fr) auto;
+        gap: 1rem;
+        align-items: start;
+        z-index: 1100;
+    }
+
+    .brand-block,
+    .header-search,
+    .header-actions,
+    .status-toast {
+        pointer-events: auto;
+    }
+
+    .brand-block {
+        padding: 1rem 1.1rem;
+        border-radius: 1.5rem;
+        background: rgba(17, 24, 39, 0.68);
+        color: white;
+        backdrop-filter: blur(18px);
+        box-shadow: var(--shadow-lg);
     }
 
     .brand {
+        display: inline-block;
+        margin-bottom: 0.45rem;
+        font-family: var(--font-display);
+        font-size: 1.6rem;
         font-weight: 700;
-        font-size: var(--xl);
+        color: white;
     }
 
-    .landing-main {
-        margin: 0 auto;
-        width: min(100%, var(--container-xl));
-        gap: var(--xxxl);
+    .brand-copy {
+        color: rgba(255, 255, 255, 0.82);
     }
 
-    .hero {
-        max-width: 56ch;
+    .header-search {
+        display: flex;
+        gap: 1rem;
+        align-items: flex-start;
     }
 
-    .eyebrow {
+    .header-actions {
+        display: flex;
+        gap: 0.75rem;
+        align-items: center;
+        padding: 0.7rem 0.8rem;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.88);
+        backdrop-filter: blur(18px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .action-link {
         display: inline-flex;
-        font-weight: 700;
-        border-radius: var(--sm);
-        padding: 0.2rem 0.75rem;
-        width: fit-content;
+        align-items: center;
+        justify-content: center;
+        min-height: 2.6rem;
+        padding: 0.7rem 1rem;
+        border-radius: 999px;
+        font-weight: 600;
+        color: var(--color-text);
     }
 
-    h1 {
-        font-size: clamp(2.2rem, 6vw, 4rem);
+    .action-link.primary {
+        background: var(--color-text);
+        color: white;
     }
 
-    .hero-actions {
-        flex-wrap: wrap;
-        justify-content: flex-start;
+    .status-toast {
+        position: absolute;
+        left: 1rem;
+        bottom: 1rem;
+        max-width: min(28rem, calc(100vw - 2rem));
+        padding: 0.95rem 1rem;
+        border-radius: 1rem;
+        background: rgba(255, 255, 255, 0.92);
+        box-shadow: var(--shadow-lg);
+        backdrop-filter: blur(16px);
+        color: var(--color-text-muted);
+        z-index: 1100;
     }
 
-    .cards {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-        gap: var(--lg);
+    .status-toast.error {
+        background: var(--color-error-bg);
+        color: var(--color-error);
+        border: 1px solid var(--color-error-border);
     }
 
-    .feature-card {
-        gap: var(--md);
-    }
-
-    .footer {
-        max-width: var(--container-xl);
-        margin: 0 auto;
-        padding: var(--xl);
-        flex-wrap: wrap;
-    }
-
-    @media (max-width: 768px) {
-        .topbar,
-        .footer {
-            justify-content: center;
+    @media (max-width: 1100px) {
+        .landing-header {
+            grid-template-columns: 1fr;
         }
 
-        .topbar .actions {
+        .header-search {
+            flex-wrap: wrap;
+        }
+
+        .header-actions {
+            justify-content: flex-start;
+            width: fit-content;
+        }
+    }
+
+    @media (max-width: 720px) {
+        .landing-header {
+            inset: 0.75rem 0.75rem auto 0.75rem;
+        }
+
+        .header-search {
+            gap: 0.75rem;
+        }
+
+        .header-actions {
             width: 100%;
-            justify-content: center;
+            flex-wrap: wrap;
+            border-radius: 1.25rem;
+        }
+
+        .status-toast {
+            left: 0.75rem;
+            right: 0.75rem;
+            bottom: 0.75rem;
+            max-width: none;
         }
     }
 </style>
