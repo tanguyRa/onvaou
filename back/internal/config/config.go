@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strings"
 )
 
 type Config struct {
@@ -12,10 +13,27 @@ type Config struct {
 	Address     string           `json:"address"`
 	Encryption  EncryptionConfig `json:"encryption"`
 	Database    DatabaseConfig   `json:"database"`
+	Ingestion   IngestionConfig  `json:"ingestion"`
 	Payment     PaymentConfig    `json:"payment"`
 	Polar       PolarConfig      `json:"polar"`
 	LLM         LLMsConfig       `json:"llm"`
 	Storage     StorageConfig    `json:"storage"`
+}
+
+type IngestionConfig struct {
+	BANAPIURL                         string   `json:"banApiUrl"`
+	DataGouvAPIURL                    string   `json:"datagouvApiUrl"`
+	OpenAgendaAPIURL                  string   `json:"openagendaApiUrl"`
+	OpenAgendaAPIKey                  string   `json:"openagendaApiKey"`
+	OpenAgendaOfficialOnly            bool     `json:"openagendaOfficialOnly"`
+	OpenAgendaAgendaUpdatedWithinDays int      `json:"openagendaAgendaUpdatedWithinDays"`
+	OpenAgendaMaxAgendas              int      `json:"openagendaMaxAgendas"`
+	HTTPTimeoutSeconds                int      `json:"httpTimeoutSeconds"`
+	BANRetryAttempts                  int      `json:"banRetryAttempts"`
+	DebugDir                          string   `json:"debugDir"`
+	SchedulerTimezone                 string   `json:"schedulerTimezone"`
+	OpenAgendaQueries                 []string `json:"openagendaQueries"`
+	DataGouvQueries                   []string `json:"datagouvQueries"`
 }
 
 type LLMsConfig struct {
@@ -119,6 +137,54 @@ func loadFromEnv(config *Config) {
 		}
 	}
 
+	// Ingestion configuration
+	if value := os.Getenv("BAN_API_URL"); value != "" {
+		config.Ingestion.BANAPIURL = value
+	}
+	if value := os.Getenv("DATAGOUV_API_URL"); value != "" {
+		config.Ingestion.DataGouvAPIURL = value
+	}
+	if value := os.Getenv("OPENAGENDA_API_URL"); value != "" {
+		config.Ingestion.OpenAgendaAPIURL = value
+	}
+	if value := os.Getenv("OPENAGENDA_API_KEY"); value != "" {
+		config.Ingestion.OpenAgendaAPIKey = value
+	}
+	if value := os.Getenv("OPENAGENDA_OFFICIAL_ONLY"); value != "" {
+		if v, err := parseBool(value); err == nil {
+			config.Ingestion.OpenAgendaOfficialOnly = v
+		}
+	}
+	if value := os.Getenv("OPENAGENDA_AGENDA_UPDATED_WITHIN_DAYS"); value != "" {
+		if v, err := parseInt(value); err == nil {
+			config.Ingestion.OpenAgendaAgendaUpdatedWithinDays = v
+		}
+	}
+	if value := os.Getenv("OPENAGENDA_MAX_AGENDAS"); value != "" {
+		if v, err := parseInt(value); err == nil {
+			config.Ingestion.OpenAgendaMaxAgendas = v
+		}
+	}
+	if value := os.Getenv("HTTP_TIMEOUT_SECONDS"); value != "" {
+		if v, err := parseInt(value); err == nil {
+			config.Ingestion.HTTPTimeoutSeconds = v
+		}
+	}
+	if value := os.Getenv("BAN_RETRY_ATTEMPTS"); value != "" {
+		if v, err := parseInt(value); err == nil {
+			config.Ingestion.BANRetryAttempts = v
+		}
+	}
+	if value := os.Getenv("INGESTION_DEBUG_DIR"); value != "" {
+		config.Ingestion.DebugDir = value
+	}
+	if value := os.Getenv("SCHEDULER_TIMEZONE"); value != "" {
+		config.Ingestion.SchedulerTimezone = value
+	}
+	if value := os.Getenv("DATAGOUV_SEARCH_QUERIES"); value != "" {
+		config.Ingestion.DataGouvQueries = splitCSV(value)
+	}
+
 	// Polar configuration
 	if polarWebhookSecret := os.Getenv("POLAR_WEBHOOK_SECRET"); polarWebhookSecret != "" {
 		config.Polar.WebhookSecret = polarWebhookSecret
@@ -201,6 +267,18 @@ func setDefaults() *Config {
 		Storage: StorageConfig{
 			Provider: "fs",
 		},
+		Ingestion: IngestionConfig{
+			BANAPIURL:                         "https://api-adresse.data.gouv.fr",
+			DataGouvAPIURL:                    "https://www.data.gouv.fr/api/1",
+			OpenAgendaAPIURL:                  "https://api.openagenda.com/v2",
+			OpenAgendaOfficialOnly:            true,
+			OpenAgendaAgendaUpdatedWithinDays: 30,
+			HTTPTimeoutSeconds:                20,
+			BANRetryAttempts:                  3,
+			DebugDir:                          "data/ingestion-debug",
+			SchedulerTimezone:                 "Europe/Paris",
+			DataGouvQueries:                   []string{"agenda", "evenement", "culture", "festival", "mairie"},
+		},
 	}
 }
 
@@ -231,4 +309,16 @@ func validate(config *Config) error {
 	}
 
 	return nil
+}
+
+func splitCSV(value string) []string {
+	parts := strings.Split(value, ",")
+	out := make([]string, 0, len(parts))
+	for _, part := range parts {
+		part = strings.TrimSpace(part)
+		if part != "" {
+			out = append(out, part)
+		}
+	}
+	return out
 }

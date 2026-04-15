@@ -48,6 +48,7 @@ WORKDIR /app
 COPY . .
 
 RUN CGO_ENABLED=0 GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build -ldflags="-w -s" -o /server ./cmd/server
+RUN CGO_ENABLED=0 GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build -ldflags="-w -s" -o /ingest ./cmd/ingest
 
 # ============================================
 # Stage 4: Production
@@ -59,6 +60,7 @@ RUN apk --no-cache add ca-certificates tzdata
 WORKDIR /app
 
 COPY --from=builder /server /server
+COPY --from=builder /ingest /ingest
 
 EXPOSE 8080
 

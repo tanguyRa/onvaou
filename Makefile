@@ -6,7 +6,7 @@ BACKEND_SERVICE := back
 
 .PHONY: help build start stop restart logs clean \
         check-backend-running migrate-up migrate-down migration sqlc \
-        front back test
+        front back test ingest ingest-artifacts ingest-replay
 
 # ============================================
 # Help
@@ -31,6 +31,9 @@ help:
 	@echo "  front         SSH into frontend container"
 	@echo "  back          SSH into backend container"
 	@echo "  test          Run tests"
+	@echo "  ingest        Run Go ETL worker in backend container (SOURCE=openagenda|datagouv|vacuum or ALL=1)"
+	@echo "  ingest-artifacts List recent ETL debug artifacts (LIMIT optional, default: 20)"
+	@echo "  ingest-replay Replay an ETL debug artifact (ARTIFACT_ID required)"
 	@echo "  stats         Show container statistics"
 	@echo "  pull          Pull latest images"
 	@echo "  db_env        Show database environment variable to verify 1password/docker setup"
@@ -107,6 +110,19 @@ stats:
 
 test:
 	${DEV_COMPOSE} exec -it ${BACKEND_SERVICE} go test ./...
+
+ingest: check-backend-running
+	${DEV_COMPOSE} exec -T ${BACKEND_SERVICE} sh -c 'if [ "$(ALL)" = "1" ]; then go run ./cmd/ingest --all; elif [ -n "$(SOURCE)" ]; then go run ./cmd/ingest --source="$(SOURCE)"; else go run ./cmd/ingest --all; fi'
+
+ingest-artifacts: check-backend-running
+	${DEV_COMPOSE} exec -T ${BACKEND_SERVICE} sh -c 'go run ./cmd/ingest --list-artifacts --limit="$(if $(LIMIT),$(LIMIT),20)"'
+
+ingest-replay: check-backend-running
+	@if [ -z "$(ARTIFACT_ID)" ]; then \
+		echo "Usage: make ingest-replay ARTIFACT_ID=<artifact-id>"; \
+		exit 1; \
+	fi
+	${DEV_COMPOSE} exec -T ${BACKEND_SERVICE} sh -c 'go run ./cmd/ingest --replay-artifact="$(ARTIFACT_ID)"'
 
 db_env:
 	op run --env-file=".env.dev" -- ${DEV_COMPOSE} exec -T ${BACKEND_SERVICE} sh -c 'printenv | grep DATABASE_URL'
